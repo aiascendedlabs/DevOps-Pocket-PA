@@ -1,0 +1,35 @@
+name: Publish to GitHub Packages
+
+# Publishes a new version of @aiascendedlabs/devops-pocket-pa to GitHub Packages
+# whenever a version tag (v*) is pushed — e.g. git tag v1.1.0 && git push --tags
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@aiascendedlabs'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
